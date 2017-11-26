@@ -17,6 +17,7 @@ from sklearn.neighbors import KNeighborsClassifier
 
 # for the Ex4.5
 from sklearn.model_selection import StratifiedKFold
+from sklearn.metrics import average_precision_score
 
 
 # Ex1
@@ -31,7 +32,7 @@ def kmeans(X, k=10):
     Returns:
         A KMeans model trained on X.
     """
-    model = KMeans(k)
+    model = KMeans(n_clusters=k)
     model.fit(X)
     return model
 
@@ -64,7 +65,7 @@ def try_kmeans(X):
     best_score = -1
 
     for k in range(2, 20+1):
-        model = KMeans(k)
+        model = KMeans(n_clusters=k)
         model.fit(X)
         labels = model.predict(X)
         score = silhouette_score(model.transform(X), labels)
@@ -90,7 +91,7 @@ def agglomerative_clustering(X, k=10):
     Returns:
         An AgglomerativeClustering model trained on X.
     """
-    model = AgglomerativeClustering(k)
+    model = AgglomerativeClustering(n_clusters=k)
     model.fit(X)
 
     # Note all the other functions are the same except we use
@@ -132,7 +133,7 @@ def test_kneighbors_k1_3(X, y):
     """
     X_train, X_test, y_train, y_test = get_train_test_sets(X, y)
 
-    knn_k1 = KNeighborsClassifier(1)
+    knn_k1 = KNeighborsClassifier(n_clusters=1)
     knn_k1.fit(X_train, y_train)
 
     # score = accuracy = % good observations
@@ -140,7 +141,7 @@ def test_kneighbors_k1_3(X, y):
     print("KNeighbors with k=1:", score_k1)
 
     # Ex4.3
-    knn_k3 = KNeighborsClassifier(3)
+    knn_k3 = KNeighborsClassifier(n_clusters=3)
     knn_k3.fit(X_train, y_train)
 
     # score = accuracy = % good observations
@@ -192,9 +193,15 @@ def find_best_k_for_kneighbors(X, y, n_splits=5):
             X_subtrain, X_subtest = X[train_idx], X[test_idx]
             y_subtrain, y_subtest = y[train_idx], y[test_idx]
 
-            knn = KNeighborsClassifier(k)
+            knn = KNeighborsClassifier(n_clusters=k)
             knn.fit(X_subtrain, y_subtrain)
             score = knn.score(X_subtest, y_subtest)
+
+            # Alternative score: precision-recall
+            # See http://scikit-learn.org/stable/auto_examples/model_selection/plot_precision_recall.html
+            #
+            # y_pred = knn.predict(X_subtest)
+            # score = average_precision_score(y_subtest, y_pred)
 
             score_sum += score
 
@@ -207,7 +214,7 @@ def find_best_k_for_kneighbors(X, y, n_splits=5):
             best_k = k
 
     # re-launch on the whole dataset
-    knn = KNeighborsClassifier(best_k)
+    knn = KNeighborsClassifier(n_clusters=best_k)
     knn.fit(X_train, y_train)
     score = knn.score(X_test, y_test)
 
