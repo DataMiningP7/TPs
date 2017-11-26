@@ -64,6 +64,10 @@ def occurrences(lst):
 
         d[e] += 1
 
+        # shorter alternatives:
+        # d[e] = d[e] + 1 if e in d else d
+        # d[e] = d.get(e, 0) + 1
+
     return d
 
 
@@ -75,15 +79,15 @@ def unique(lst):
     Returns:
         A list containing the unique values in lst.
     """
-    lst2 = []
-    dejavu = set()
+    unique_values = []
+    seen = set()
 
     for e in lst:
-        if e not in dejavu:
-            lst2.append(e)
-            dejavu.add(e)
+        if e not in seen:
+            unique_values.append(e)
+            seen.add(e)
 
-    return lst2
+    return unique_values
 
 
 # Ex 2.1
@@ -129,10 +133,9 @@ def quicksort(lst):
     lower = []
     higher = []
 
-    for i, e in enumerate(lst):
-        if i == 0:
-            # pivot
-            continue
+    # skip the first element because it's the pivot
+    for i in range(1, lst):
+        e = lst[i]
 
         if e <= pivot:
             lower.append(e)
@@ -182,7 +185,13 @@ def exam_success(n, p):
         An integer representing the total number of exams passed by the
         student.
     """
-    return p ** n
+    successes = 0
+
+    for _ in range(n):
+        if random() < p:
+            successes += 1
+
+    return successes
 
 
 # Ex 4.1
