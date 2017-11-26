@@ -31,7 +31,8 @@ def kmeans(X, k=10):
     Returns:
         A KMeans model trained on X.
     """
-    model = KMeans(k).fit(X)
+    model = KMeans(k)
+    model.fit(X)
     return model
 
 def evaluate_kmeans(X, model):
@@ -89,7 +90,8 @@ def agglomerative_clustering(X, k=10):
     Returns:
         An AgglomerativeClustering model trained on X.
     """
-    model = AgglomerativeClustering(k).fit(X)
+    model = AgglomerativeClustering(k)
+    model.fit(X)
 
     # Note all the other functions are the same except we use
     # 'AgglomerativeClustering' instead of 'KMeans'.
@@ -158,7 +160,7 @@ def test_kneighbors_k1_3(X, y):
 # See the 6th lecture, slides 29 and 44-45.
 
 # Ex4.5
-def find_best_k_for_kneighbors(X, y):
+def find_best_k_for_kneighbors(X, y, n_splits=5):
     """ Test the KNeighborsClassifier on X and y with various values of k and
      return the best one.
 
@@ -168,12 +170,13 @@ def find_best_k_for_kneighbors(X, y):
            transform_text() from the TP2.
         y: a binary vector where the i-th value indicates whether the i-th is a
            spam or a ham.
+        n_split: number of train/test splits to perform. Default to 5
+           (arbitrary).
     Returns:
         An int indicating the best value for k.
     """
     X_train, X_test, y_train, y_test = train_test_split(X, y)
 
-    n_splits = 5  # arbitrary
     skf = StratifiedKFold(n_splits=n_splits)
 
     best_k = 1
