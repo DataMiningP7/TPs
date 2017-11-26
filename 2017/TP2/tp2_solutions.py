@@ -19,8 +19,8 @@ def read_dataset(filename):
     f = open(filename)
 
     for line in f.readlines():
-        spam, text = line.split("\t", 1)
-        text_type = 1 if spam == "spam" else 0
+        label, text = line.split("\t", 1)
+        text_type = 1 if label == "spam" else 0
         lines.append( (text_type, text) )
 
     f.close()
@@ -45,7 +45,14 @@ def spams_count(texts):
     return spams_count
 
 
-# Ex 1.3+1.4
+# Ex 1.3
+# See http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html
+# for the parameters
+def make_tfidf(min_df=0.0005):
+    return TfidfVectorizer(stop_words="english", min_df=min_df)
+
+
+# Ex 1.4
 def transform_text(pairs):
     """ Transforms the pair data into a matrix X containing tf-idf values
      for the messages and a vector y containing 0s and 1s (for hams and spams
@@ -60,15 +67,12 @@ def transform_text(pairs):
         Y: a vector whose i-th element is 0 if the i-th message is a ham, else
         1.
     """
-    # Ex 1.3
-    # See http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html
-    # for the parameters
-    tfidf = TfidfVectorizer(stop_words="english", min_df=0.0005)
+    tfidf = make_tfidf()
 
     types = []
     texts = []
-    for type, text in pairs:
-        types.append(type)
+    for label, text in pairs:
+        types.append(label)
         texts.append(text)
 
     X = tfidf.fit_transform(texts)
@@ -100,11 +104,11 @@ def test_word_means(X, y, word_index):
         that the word is NOT over-represented in the spams).
    """
     # get a full matrice instead of a sparse one
-    X = X.toarray()
+    X = X.todense()
 
     x0 = X[ y == 0, word_index ]
     x1 = X[ y == 1, word_index ]
 
+    #  t < 0 means x0 < x1
     t, p = ttest_ind(x0, x1)
-    if t < 0: # == x0 < x1
-        return p
+    return p
